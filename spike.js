@@ -29,7 +29,7 @@
       .then(function (t) {
         var j; try { j = JSON.parse(t); } catch (e) { throw new Error('Server replied with a web page, not data (has setup() been run?)'); }
         j.totalMs = Date.now() - t0; return j;
-      });
+      }, function (e) { throw new Error(/fetch/i.test(e.message) ? 'Could not reach the server (no signal, or its one-time setup has not been run yet)' : e.message); });
   }
   $('small').onclick = function () {
     $('callOut').textContent = 'Calling...';
