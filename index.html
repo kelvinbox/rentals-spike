@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; frame-src https://accounts.google.com/gsi/; connect-src 'self' https://script.google.com https://script.googleusercontent.com https://accounts.google.com/gsi/; img-src 'self' data:">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Rentals test">
+<meta name="theme-color" content="#0f766e">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
+<title>Rentals test</title>
+<link rel="stylesheet" href="spike.css">
+</head><body>
+<header><h1>Rentals app test</h1><div class="small" id="mode"></div></header>
+<main>
+<p class="small">A throwaway page to prove the new app can work on this phone before it is built. It holds no tenant data. Add it to your home screen, open it from there, and run each check.</p>
+
+<section><h2>1. Storage kept after closing</h2>
+<div id="store">Checking...</div>
+<p class="small">To test: open this from the home-screen icon, close the app completely (swipe it away), open it again. Every row should say Kept.</p></section>
+
+<section><h2>2. Talking to the server</h2>
+<div class="row"><button id="small">Small call</button><button id="big">2 MB call (like a photo)</button></div>
+<div id="callOut" class="out"></div></section>
+
+<section><h2>3. Sign in with Google</h2>
+<p class="small">Try the normal button first. If nothing happens or it gets stuck, try the second one.</p>
+<div id="gNote" class="small"></div>
+<div id="gPopup"></div><div style="height:10px"></div><div id="gRedirect"></div>
+<div id="gOut" class="out"></div></section>
+
+<section><h2>4. Sign in with an emailed code</h2>
+<div class="row"><input id="email" type="email" placeholder="your Google email" autocomplete="email"><button id="sendCode">Email me a code</button></div>
+<div class="row"><input id="code" inputmode="numeric" placeholder="6-digit code" maxlength="6"><button id="checkCode">Sign in</button></div>
+<div id="cOut" class="out"></div></section>
+
+<section><h2>5. Signed in after closing</h2>
+<button id="who">Check who I am</button><button id="signout" class="quiet">Forget sign-in</button>
+<div id="whoOut" class="out"></div>
+<p class="small">After signing in above, close the app completely, reopen it and press Check who I am.</p></section>
+
+<section><h2>6. Opens without signal</h2>
+<div id="swOut" class="out"></div>
+<p class="small">To test: open the app once with signal, turn on Airplane mode, close the app completely, then open it again. This page should still appear.</p></section>
+
+<section><h2>Results</h2><button id="copy">Copy all results</button><p class="small">Paste them into the chat with Claude.</p></section>
+</main>
+<script src="config.js"></script>
+<script src="probe.js"></script>
+<script src="spike.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+</body></html>
