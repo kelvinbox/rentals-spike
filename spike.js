@@ -2,13 +2,14 @@
 (function () {
   var VERSION = 'spike 1';
   var $ = function (id) { return document.getElementById(id); };
-  var results = {};
+  var results = {}; try { results = JSON.parse(localStorage.getItem('spike-results') || '{}'); } catch (e) {}
+  function keep() { try { localStorage.setItem('spike-results', JSON.stringify(results)); } catch (e) {} }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
-  function show(id, ok, text) { $(id).innerHTML = '<span class="' + (ok ? 'ok' : 'bad') + '">' + (ok ? 'OK' : 'Problem') + '</span> ' + esc(text); results[id] = (ok ? 'OK ' : 'PROBLEM ') + text; }
+  function show(id, ok, text) { $(id).innerHTML = '<span class="' + (ok ? 'ok' : 'bad') + '">' + (ok ? 'OK' : 'Problem') + '</span> ' + esc(text); results[id] = (ok ? 'OK ' : 'PROBLEM ') + text + ' [' + new Date().toLocaleTimeString('en-NZ') + (navigator.onLine ? '' : ', offline') + ']'; keep(); }
 
   var standalone = !!(navigator.standalone || (window.matchMedia && matchMedia('(display-mode: standalone)').matches));
   $('mode').textContent = VERSION + ' · ' + (standalone ? 'opened from the home screen' : 'opened in the browser (add to home screen for the real test)');
-  results.mode = standalone ? 'home screen' : 'browser';
+  results.mode = standalone ? 'home screen' : 'browser'; keep();
   results.browser = navigator.userAgent;
 
   /* 1. Storage */
@@ -17,7 +18,7 @@
     Promise.all([Probe.start(), persist]).then(function (r) {
       var o = r[0];
       $('store').innerHTML = Probe.html(o) + '<div class="small">Asked the phone to keep data: ' + (r[1] === null ? 'not supported' : r[1] ? 'yes' : 'no') + '</div>';
-      results.storage = o.rows.map(function (x) { return x.name + ': ' + (x.err ? 'error ' + x.err : x.prev ? 'kept #' + x.prev.n : 'empty'); }).join('; ') + '; persist=' + r[1];
+      results.storage = o.rows.map(function (x) { return x.name + ': ' + (x.err ? 'error ' + x.err : x.prev ? 'kept #' + x.prev.n : 'empty'); }).join('; ') + '; persist=' + r[1]; keep();
     });
   }
 
@@ -57,7 +58,7 @@
   var gisTries = 0;
   function gisReady() {
     if (!CONFIG.clientId) { $('gNote').textContent = 'Waiting for the Google client ID to be set up.'; results.google = 'client ID not set'; return; }
-    if (!(window.google && google.accounts && google.accounts.id)) { if (gisTries++ < 50) return setTimeout(gisReady, 200); $('gNote').textContent = 'Google sign-in script did not load.'; results.google = 'script did not load'; return; }
+    if (!(window.google && google.accounts && google.accounts.id)) { if (gisTries++ < 50) return setTimeout(gisReady, 200); $('gNote').textContent = navigator.onLine ? 'Google sign-in script did not load.' : 'No signal: Google sign-in needs the internet.'; if (navigator.onLine) { results.google = 'script did not load'; keep(); } return; }
     var popupCb = function (r) {
       $('gOut').textContent = 'Checking with the server...';
       call({ fn: 'google', idToken: r.credential }).then(signedIn('gOut', 'Google popup'), function (e) { show('gOut', false, 'Google popup: ' + e.message); });
@@ -110,6 +111,7 @@
         function (e) { show('swOut', false, 'offline cache failed: ' + e.message); });
   } else show('swOut', false, 'this browser has no offline support');
 
+  $('clearRes').onclick = function () { results = {}; keep(); $('copy').textContent = 'Copy all results'; };
   $('copy').onclick = function () {
     var t = Object.keys(results).map(function (k) { return k + ': ' + results[k]; }).join('\n');
     (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { $('copy').textContent = 'Copied'; }, function () { prompt('Copy these results:', t); });

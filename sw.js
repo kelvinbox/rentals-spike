@@ -1,5 +1,5 @@
 /* Offline start for the spike page: cache the page's own files, serve them when there's no signal. */
-var CACHE = 'spike-2';
+var CACHE = 'spike-3';
 var FILES = ['./', 'index.html', 'spike.css', 'spike.js', 'probe.js', 'config.js', 'manifest.webmanifest', 'icon-180.png', 'icon-512.png'];
 self.addEventListener('install', function (e) { e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); })); });
 self.addEventListener('activate', function (e) {
