@@ -18,7 +18,11 @@
     Promise.all([Probe.start(), persist]).then(function (r) {
       var o = r[0];
       $('store').innerHTML = Probe.html(o) + '<div class="small">Asked the phone to keep data: ' + (r[1] === null ? 'not supported' : r[1] ? 'yes' : 'no') + '</div>';
-      results.storage = o.rows.map(function (x) { return x.name + ': ' + (x.err ? 'error ' + x.err : x.prev ? 'kept #' + x.prev.n : 'empty'); }).join('; ') + '; persist=' + r[1]; keep();
+      results.storage = o.rows.map(function (x) { return x.name + ': ' + (x.err ? 'error ' + x.err : x.prev ? 'kept #' + x.prev.n : 'empty'); }).join('; ') + '; persist=' + r[1];
+      var st = function (n) { var x = o.rows.filter(function (y) { return y.name.indexOf(n) === 0; })[0]; return !x ? '?' : x.err ? 'error' : x.prev ? 'kept#' + x.prev.n : 'EMPTY'; };
+      var log = results.opens ? String(results.opens).split(' | ') : [];
+      log.push(new Date().toLocaleTimeString('en-NZ') + (standalone ? ' icon' : ' browser') + (navigator.onLine ? '' : ' offline') + ': local ' + st('Local') + ', idb ' + st('IndexedDB'));
+      results.opens = log.slice(-12).join(' | '); keep();
     });
   }
 
